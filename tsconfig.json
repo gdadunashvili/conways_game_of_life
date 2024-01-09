@@ -1,8 +1,6 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "rootDir": "src", 
-        "outDir": "scripts",
         "sourceMap": true,
         "lib": [
             "es5",

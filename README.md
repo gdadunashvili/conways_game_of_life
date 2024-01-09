@@ -21,7 +21,7 @@ run
 python3 -m http.serve
 ```
 in the same folder as the `index.html` file.
-Note that `index.html` file relies on the javascript file, which is located in the scripts folder and generated during the
+Note that `index.html` file relies on the javascript file, which is located in the same folder folder and generated during the
 build step.
 
 ## working features

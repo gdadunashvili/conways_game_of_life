@@ -6,7 +6,7 @@ class DrawingApp {
   private click_x: number[] = [];
   private click_y: number[] = [];
  
-  private n_cells_1D: number = 40;
+  private n_cells_1D: number = 10;
 
   private cell_width: number ;
   private exit_condition: boolean = true;
@@ -21,6 +21,7 @@ class DrawingApp {
 
   constructor() {
 
+    console.log('bla');
     let canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.context = canvas.getContext("2d");
     this.canvas = canvas;

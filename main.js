@@ -3,7 +3,7 @@ var DrawingApp = /** @class */ (function () {
         var _this = this;
         this.click_x = [];
         this.click_y = [];
-        this.n_cells_1D = 40;
+        this.n_cells_1D = 10;
         this.exit_condition = true;
         this.recording = false;
         this.viodeoExists = false;
@@ -19,6 +19,7 @@ var DrawingApp = /** @class */ (function () {
             _this.add_click(mouseX, mouseY);
             _this.redraw();
         };
+        console.log('bla');
         var canvas = document.getElementById('canvas');
         this.context = canvas.getContext("2d");
         this.canvas = canvas;
