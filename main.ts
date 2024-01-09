@@ -6,7 +6,7 @@ class DrawingApp {
   private click_x: number[] = [];
   private click_y: number[] = [];
  
-  private n_cells_1D: number = 10;
+  private n_cells_1D: number = 90;
 
   private cell_width: number ;
   private exit_condition: boolean = true;
@@ -45,7 +45,7 @@ class DrawingApp {
     this.cell_width = this.canvas.width / this.n_cells_1D;
     this.create_user_events();
     
-    setInterval(()=>{this.run();}, 100);
+    setInterval(()=>{this.run();}, 50);
 
   }
 

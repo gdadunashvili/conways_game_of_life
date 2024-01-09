@@ -3,7 +3,7 @@ var DrawingApp = /** @class */ (function () {
         var _this = this;
         this.click_x = [];
         this.click_y = [];
-        this.n_cells_1D = 10;
+        this.n_cells_1D = 90;
         this.exit_condition = true;
         this.recording = false;
         this.viodeoExists = false;
@@ -40,7 +40,7 @@ var DrawingApp = /** @class */ (function () {
         this.create_glider(i, j);
         this.cell_width = this.canvas.width / this.n_cells_1D;
         this.create_user_events();
-        setInterval(function () { _this.run(); }, 100);
+        setInterval(function () { _this.run(); }, 50);
     }
     DrawingApp.prototype.draw_grid = function () {
         this.context.strokeStyle = 'black';
