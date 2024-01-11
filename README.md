@@ -3,6 +3,9 @@
 This is a simple tpescript implementaion of conways game of life.
 I did it for fun to learn typescript.
 
+[conways_game_of_life.webm](https://github.com/gdadunashvili/conways_game_of_life/assets/25377791/befea02b-bab6-4891-a369-eeac833f98b5)
+
+
 ## How to Build
 To create a javascript file from source install
 TypeScript, by running:
