@@ -18,7 +18,6 @@ class DrawingApp {
 
   constructor() {
 
-    console.log('bla');
     let canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.context = canvas.getContext("2d");
     this.canvas = canvas;
@@ -67,7 +66,6 @@ class DrawingApp {
 
   private slider_changed:boolean = false;
   private slider_event_handler(){
-    console.log("slider changed");
     this.slider_changed = true;
     let persumptive_width = document.getElementById('system_width')['value'];
     let text: string =""
@@ -88,8 +86,6 @@ class DrawingApp {
   private cell_width(): number{ return this.canvas.width / this.n_cells_1D(); } 
 
   private init_state(callback: (i: number, j: number)=>boolean){
-    console.log(this.n_cells_1D);
-
     this.state = [];
     this.next_state = [];
     let pixel_state: boolean;
@@ -209,13 +205,11 @@ class DrawingApp {
     const scale: number = n / this.canvas.width;
     const i = Math.floor(y*scale);
     const j = Math.floor(x*scale);
-    console.log(i,j, x,y);
     const i2 = n-i-1;
     this.state[i2][j] = !this.state[i2][j];
   }
 
   private draw_pixel(i: number, j: number) {
-    // console.log("drawing:",i,j);
     const ctx = this.context;
     const w: number = this.cell_width();
     const n: number = this.n_cells_1D();
@@ -249,12 +243,10 @@ class DrawingApp {
     let canvas = this.canvas;
 
     canvas.addEventListener('mouseenter', () => {
-      console.log("enter");
       canvas.classList.add('crosshair-cursor');
     });
 
     canvas.addEventListener('mouseleave', () => {
-      console.log("leave");
       canvas.classList.remove('crosshair-cursor');
     });
 

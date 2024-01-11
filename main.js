@@ -27,7 +27,6 @@ var DrawingApp = /** @class */ (function () {
                 _this.press_event_handler(e);
             }
         };
-        console.log('bla');
         var canvas = document.getElementById('canvas');
         this.context = canvas.getContext("2d");
         this.canvas = canvas;
@@ -68,7 +67,6 @@ var DrawingApp = /** @class */ (function () {
         }
     };
     DrawingApp.prototype.slider_event_handler = function () {
-        console.log("slider changed");
         this.slider_changed = true;
         var persumptive_width = document.getElementById('system_width')['value'];
         var text = "";
@@ -85,7 +83,6 @@ var DrawingApp = /** @class */ (function () {
     };
     DrawingApp.prototype.cell_width = function () { return this.canvas.width / this.n_cells_1D(); };
     DrawingApp.prototype.init_state = function (callback) {
-        console.log(this.n_cells_1D);
         this.state = [];
         this.next_state = [];
         var pixel_state;
@@ -196,12 +193,10 @@ var DrawingApp = /** @class */ (function () {
         var scale = n / this.canvas.width;
         var i = Math.floor(y * scale);
         var j = Math.floor(x * scale);
-        console.log(i, j, x, y);
         var i2 = n - i - 1;
         this.state[i2][j] = !this.state[i2][j];
     };
     DrawingApp.prototype.draw_pixel = function (i, j) {
-        // console.log("drawing:",i,j);
         var ctx = this.context;
         var w = this.cell_width();
         var n = this.n_cells_1D();
@@ -235,11 +230,9 @@ var DrawingApp = /** @class */ (function () {
         var _this = this;
         var canvas = this.canvas;
         canvas.addEventListener('mouseenter', function () {
-            console.log("enter");
             canvas.classList.add('crosshair-cursor');
         });
         canvas.addEventListener('mouseleave', function () {
-            console.log("leave");
             canvas.classList.remove('crosshair-cursor');
         });
         canvas.addEventListener("mousedown", this.press_event_handler);
