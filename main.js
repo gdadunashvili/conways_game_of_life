@@ -3,11 +3,13 @@ var DrawingApp = /** @class */ (function () {
         var _this = this;
         this.click_x = [];
         this.click_y = [];
-        this.n_cells_1D = 90;
         this.exit_condition = true;
         this.recording = false;
+        this.slider_changed = false;
+        this.n_cells_1D_cached = document.getElementById('system_width')['value'];
         this.viodeoExists = false;
-        this.pressEventHandler = function (e) {
+        this.is_dragging = false;
+        this.press_event_handler = function (e) {
             var mouseX = e.changedTouches ?
                 e.changedTouches[0].pageX :
                 e.pageX;
@@ -17,7 +19,13 @@ var DrawingApp = /** @class */ (function () {
             mouseX -= _this.canvas.offsetLeft;
             mouseY -= _this.canvas.offsetTop;
             _this.add_click(mouseX, mouseY);
+            _this.is_dragging = true;
             _this.redraw();
+        };
+        this.drag_event_handler = function (e) {
+            if (_this.is_dragging) {
+                _this.press_event_handler(e);
+            }
         };
         console.log('bla');
         var canvas = document.getElementById('canvas');
@@ -28,26 +36,29 @@ var DrawingApp = /** @class */ (function () {
         this.rec = new MediaRecorder(this.stream);
         this.rec.ondataavailable = function (e) { return _this.chunks.push(e.data); };
         this.rec.onstop = function () { return _this.export_vid(new Blob(_this.chunks, { type: 'video/webm' })); };
+        this.initial_state();
+        this.create_user_events();
+        setInterval(function () { _this.run(); }, 50);
+    }
+    DrawingApp.prototype.initial_state = function () {
         this.draw_grid();
-        this.init_state(function (i, _) { if (i == 0) {
+        var n = this.n_cells_1D();
+        var n_third = Math.round(n / 3);
+        this.init_state(function (_, j) { if (j == n_third) {
             return true;
         }
         else {
             return false;
         } });
-        var i = Math.round(this.n_cells_1D / 2);
-        var j = Math.round(this.n_cells_1D / 2);
-        this.create_glider(i, j);
-        this.cell_width = this.canvas.width / this.n_cells_1D;
-        this.create_user_events();
-        setInterval(function () { _this.run(); }, 50);
-    }
+        var n_half = Math.round(n / 2);
+        this.create_glider(n_half, n_half);
+    };
     DrawingApp.prototype.draw_grid = function () {
         this.context.strokeStyle = 'black';
         this.context.lineWidth = 1;
-        for (var i = 0; i <= this.n_cells_1D; i++) {
-            var x = i * this.cell_width;
-            var y = i * this.cell_width;
+        for (var i = 0; i <= this.n_cells_1D(); i++) {
+            var x = i * this.cell_width();
+            var y = i * this.cell_width();
             this.context.beginPath();
             this.context.moveTo(x, 0);
             this.context.lineTo(x, this.canvas.height);
@@ -56,14 +67,32 @@ var DrawingApp = /** @class */ (function () {
             this.context.stroke();
         }
     };
+    DrawingApp.prototype.slider_event_handler = function () {
+        console.log("slider changed");
+        this.slider_changed = true;
+        var persumptive_width = document.getElementById('system_width')['value'];
+        var text = "";
+        if (persumptive_width != this.n_cells_1D_cached) {
+            text = "<I>".concat(persumptive_width, "</I>");
+        }
+        else {
+            text = "".concat(persumptive_width);
+        }
+        document.getElementById('system_width_value').innerHTML = text;
+    };
+    DrawingApp.prototype.n_cells_1D = function () {
+        return this.n_cells_1D_cached;
+    };
+    DrawingApp.prototype.cell_width = function () { return this.canvas.width / this.n_cells_1D(); };
     DrawingApp.prototype.init_state = function (callback) {
+        console.log(this.n_cells_1D);
         this.state = [];
         this.next_state = [];
         var pixel_state;
-        for (var i = 0; i < this.n_cells_1D; ++i) {
+        for (var i = 0; i < this.n_cells_1D(); ++i) {
             this.state[i] = [];
             this.next_state[i] = [];
-            for (var j = 0; j < this.n_cells_1D; ++j) {
+            for (var j = 0; j < this.n_cells_1D(); ++j) {
                 pixel_state = callback(i, j);
                 this.state[i][j] = pixel_state;
                 this.next_state[i][j] = pixel_state;
@@ -115,7 +144,7 @@ var DrawingApp = /** @class */ (function () {
     };
     DrawingApp.prototype.count_neighbours = function (i, j) {
         var state = this.state;
-        var n = this.n_cells_1D;
+        var n = this.n_cells_1D();
         var neighbours = 0;
         for (var x = -1; x <= 1; ++x) {
             for (var y = -1; y <= 1; ++y) {
@@ -133,7 +162,7 @@ var DrawingApp = /** @class */ (function () {
     };
     DrawingApp.prototype.update_state = function () {
         var _a;
-        var n = this.n_cells_1D;
+        var n = this.n_cells_1D();
         var neighbours;
         for (var i = 0; i < n; ++i) {
             for (var j = 0; j < n; ++j) {
@@ -153,24 +182,32 @@ var DrawingApp = /** @class */ (function () {
     };
     DrawingApp.prototype.create_glider = function (lower_left_i, lower_left_j) {
         this.state[lower_left_i][lower_left_j] = true;
-        this.state[lower_left_i + 1][lower_left_j] = true;
-        this.state[lower_left_i + 2][lower_left_j] = true;
-        this.state[lower_left_i + 2][lower_left_j - 1] = true;
-        this.state[lower_left_i + 1][lower_left_j - 2] = true;
+        this.state[lower_left_i][lower_left_j + 1] = true;
+        this.state[lower_left_i][lower_left_j + 2] = true;
+        this.state[lower_left_i + 1][lower_left_j + 2] = true;
+        this.state[lower_left_i + 2][lower_left_j + 1] = true;
     };
     DrawingApp.prototype.random_int = function (min, max) {
         var randomInRange = Math.floor(Math.random() * (max - min + 1)) + min;
         return randomInRange;
     };
-    DrawingApp.prototype.turn_on_state = function (x, y) {
-        var i = Math.floor(x / this.canvas.width * this.n_cells_1D);
-        var j = Math.floor(y / this.canvas.height * this.n_cells_1D) - 1;
-        this.state[i][j] = true;
+    DrawingApp.prototype.toggle_state = function (x, y) {
+        var n = this.n_cells_1D();
+        var scale = n / this.canvas.width;
+        var i = Math.floor(y * scale);
+        var j = Math.floor(x * scale);
+        console.log(i, j, x, y);
+        var i2 = n - i - 1;
+        this.state[i2][j] = !this.state[i2][j];
     };
     DrawingApp.prototype.draw_pixel = function (i, j) {
+        // console.log("drawing:",i,j);
         var ctx = this.context;
-        ctx.fillRect(i * this.cell_width, j * this.cell_width, this.cell_width, this.cell_width);
-        if (this.state[i][j]) {
+        var w = this.cell_width();
+        var n = this.n_cells_1D();
+        var i2 = n - i - 1;
+        ctx.fillRect((j - 1) * w, i * w, w, w);
+        if (this.state[i2][j]) {
             ctx.fillStyle = 'darkred';
         }
         else {
@@ -178,8 +215,8 @@ var DrawingApp = /** @class */ (function () {
         }
     };
     DrawingApp.prototype.draw_state = function () {
-        for (var i = 0; i < this.n_cells_1D; ++i) {
-            for (var j = 0; j < this.n_cells_1D; ++j) {
+        for (var i = 0; i < this.n_cells_1D(); ++i) {
+            for (var j = 0; j < this.n_cells_1D() + 1; ++j) {
                 this.draw_pixel(i, j);
             }
         }
@@ -205,20 +242,26 @@ var DrawingApp = /** @class */ (function () {
             console.log("leave");
             canvas.classList.remove('crosshair-cursor');
         });
-        canvas.addEventListener("mousedown", this.pressEventHandler);
-        canvas.addEventListener("touchstart", this.pressEventHandler);
+        canvas.addEventListener("mousedown", this.press_event_handler);
+        canvas.addEventListener("mouseup", function () { _this.is_dragging = false; });
+        canvas.addEventListener("mousemove", this.drag_event_handler);
+        canvas.addEventListener("touchstart", this.press_event_handler);
         document.addEventListener("keydown", function (e) { if (e.key === "Escape")
             _this.pause_handeler(); });
+        document.addEventListener("keydown", function (e) { if (e.key === " ")
+            _this.pause_handeler(); });
         document.getElementById('clear').addEventListener("click", this.clear_event_handler.bind(this));
+        document.getElementById('reinitiate').addEventListener("click", this.reinitiate_event_handler.bind(this));
         document.getElementById('rand').addEventListener("click", this.random_canvas.bind(this));
         document.getElementById('pause').addEventListener("click", this.pause_handeler.bind(this));
         document.getElementById('record').addEventListener("click", this.record_handler.bind(this));
+        document.getElementById('system_width').addEventListener("change", this.slider_event_handler.bind(this));
     };
     DrawingApp.prototype.redraw = function () {
         var clickX = this.click_x;
         var clickY = this.click_y;
         for (var i = 0; i < clickX.length; ++i) {
-            this.turn_on_state(clickX[i], clickY[i]);
+            this.toggle_state(clickX[i], clickY[i]);
         }
         this.click_x = [];
         this.click_y = [];
@@ -228,8 +271,8 @@ var DrawingApp = /** @class */ (function () {
         this.click_y.push(y);
     };
     DrawingApp.prototype.clear_state = function () {
-        for (var i = 0; i < this.n_cells_1D; ++i) {
-            for (var j = 0; j < this.n_cells_1D; ++j) {
+        for (var i = 0; i < this.n_cells_1D(); ++i) {
+            for (var j = 0; j < this.n_cells_1D(); ++j) {
                 this.state[i][j] = false;
                 this.next_state[i][j] = false;
             }
@@ -241,6 +284,18 @@ var DrawingApp = /** @class */ (function () {
         this.clear_state();
         this.click_x = [];
         this.click_y = [];
+    };
+    DrawingApp.prototype.reinitiate_event_handler = function () {
+        this.exit_condition = true;
+        document.getElementById('pause').innerHTML = this.exit_condition ? "Resume" : "Pause";
+        if (this.slider_changed) {
+            this.n_cells_1D_cached = document.getElementById('system_width')['value'];
+            this.slider_changed = false;
+        }
+        this.initial_state();
+        this.clear_event_handler();
+        this.initial_state();
+        this.slider_event_handler();
     };
     DrawingApp.prototype.run = function () {
         this.draw_state();

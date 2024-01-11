@@ -28,12 +28,12 @@ build step.
 - drawing on the grid
 - random initialization
 - record video of the canvas
+- expose canvas sizs to the user
+- ereaser tooltip
 
 ## ToDo
-- ereaser tooltip
 - initialize from a selections of known configurations 
     - glider 
     - spaceship 
     ...
-- expose canvas sizs to the user
 
